@@ -84,7 +84,7 @@ class PhysicalObjects:
 
 from gym.spaces import Discrete, Box, Dict
 class Agent(PhysicalObjects):
-    dx = [0, 0, 0, 1,-1]
+    dx = [0, 0, 0, -1,1] # right, left, up (reversed), down 
     dy = [0, 1,-1, 0, 0]
     def __init__(self, initial_position, **kwargs):
         super().__init__(initial_position, **kwargs)
@@ -94,26 +94,16 @@ class Agent(PhysicalObjects):
                                         'own_position' :Box(low=-np.inf, high=np.inf, shape=(3,)), 
                                         'own_velocity': Box(low=-np.inf, high=np.inf, shape=(3,))
                                     }) 
+        self.direction_friction = np.zeros(shape=(4,))
 
-    def take_action(self, action, bound, wo_acc=False):
-        if wo_acc:
-            if action < 5:
-                p.resetBaseVelocity(self.pid, [10*Agent.dx[action]*self.acc, 10*Agent.dy[action]*self.acc, 0])
-            else:
-                raise ValueError("Undefined action %d" %action)
-            return 
-                
-        if np.linalg.norm(self.position) > bound:
-            force = [-self.position[0]/bound, -self.position[1]/bound, -self.position[2]/bound]
-            p.applyExternalForce(self.pid, -1, 
-                            forceObj=force,
-                            posObj=self.position,
-                            flags=p.WORLD_FRAME)
-            return
-            
+    def take_action(self, action):
         if action < 5 :
+            friction = (1-self.direction_friction[action-1]) if action >0 else 1
+            force = [Agent.dx[action]*self.acc*friction, 
+                     Agent.dy[action]*self.acc*friction, 
+                     0]
             p.applyExternalForce(self.pid, -1, 
-                                    forceObj = [Agent.dx[action]*self.acc, Agent.dy[action]*self.acc, 0],
+                                    forceObj = force,
                                     posObj=self.position,
                                     flags=p.WORLD_FRAME) 
         elif action == 5 :
