@@ -9,7 +9,7 @@ import pybullet_data
 
 AGENT_INFO = {
         "globalScaling" : 5,
-        "acc" : 4.3,
+        "acc" : 2.0,
         "max_speed" : 10,
         "color" : [0,125,0,1]
     }
@@ -31,14 +31,35 @@ class Labyrinth(PhysicalEnv):
         self.map = GridMap1()
         self.num_obstacles = self.map.num_obstacles
         
-        self.action_space = gym.spaces.Discrete(6) 
+        self.action_space = gym.spaces.Discrete(5) 
         
         # TODO : define the observation space
-        self.observation_space = gym.spaces.Box(-np.inf, np.inf, shape=(10,)) 
         self.connect(connect_gui)
         self.random_agent_pos = random_agent_pos
         
+        self.obs_info = {"width": 128, 
+                         "height":128,
+                         "fov" : 60,
+                         "aspect" :1,
+                         "near" : 0.02,
+                         "far":11,
+                         "renderer" : [p.ER_TINY_RENDERER, p.ER_BULLET_HARDWARE_OPENGL][0] }
+        fov, aspect, near, far = (self.obs_info['fov'],
+                                  self.obs_info['aspect'],
+                                  self.obs_info['near'],
+                                  self.obs_info['far'])
         
+        self.obs_info['view_matrix'] = p.computeViewMatrix([0, 0, 11.0], [0, 0, 0], [0, 1, 0])
+        self.obs_info['projection_matrix'] = p.computeProjectionMatrixFOV(fov, aspect, near, far)
+        self.observation_space = gym.spaces.Box(-np.inf, np.inf, shape=(self.obs_info['width'],self.obs_info['height'], 4)) 
+        
+    def obs(self):
+        images = p.getCameraImage(self.obs_info['width'],
+                          self.obs_info['height'],
+                          self.obs_info['view_matrix'],
+                          self.obs_info['projection_matrix'],
+                          renderer=self.obs_info['renderer'])
+        return images[2]/255.0    
     def connect(self, connect_gui):
         if connect_gui:
             p.connect(p.GUI)            
@@ -85,6 +106,7 @@ class Labyrinth(PhysicalEnv):
                     self.build_position("obstacle", [r-self.map.init_position[0], c-self.map.init_position[1] ,0], **self.obstacle_info)
         for obj in self.objects["obstacle"]:
             p.changeDynamics(obj.pid, -1, mass=100000)
+        return self.obs()
 
     def step(self, agent_action):
         agent= self.objects['agent'][0]
@@ -99,39 +121,25 @@ class Labyrinth(PhysicalEnv):
                     obj.decrease_velocity()
                     obj.clip_velocity()
 
-        state =np.hstack([self.objects['agent'][0].position,
-                                   self.objects['agent'][0].velocity])
 
         reward = self._reward(agent)
         done = self._done(agent)
         info = self._info()
-        return state, reward, done, info
+        return self.obs(), reward, done, info
 
     def _reward(self, agent): 
-        reward = agent.position[1]  # y value itself 
+        if agent.position[0] >2 and agent.position[1] < -3:
+            reward = 1
+        else:
+            reward = -0.001 # time penalty
         return reward 
 
     def _done(self, agent):
-        done = False
-        
-        # 3.0 is almost 
-        if agent.position[0] > 3.0:
-            done = True 
-
+        if agent.position[0] > 2 and agent.position[1] < -3:
+            done = True
+        else:
+            done = False
         return done
          
     def _info(self):
         return {}
-
-import time 
-if __name__ == "__main__":
-
-    system_vector = np.random.random(size=(6,))
-    env = Labyrinth(True, 10, system_vector)
-    env.reset()        
-    
-    for j in range(5000):
-        state, reward, done, info = env.step(env.action_space.sample())
-        if done:
-            env.reset()
-        time.sleep(0.000005)
