@@ -32,6 +32,8 @@ class Labyrinth(PhysicalEnv):
         self.num_obstacles = self.map.num_obstacles
         
         self.action_space = gym.spaces.Discrete(6) 
+        
+        # TODO : define the observation space
         self.observation_space = gym.spaces.Box(-np.inf, np.inf, shape=(10,)) 
         self.connect(connect_gui)
         self.random_agent_pos = random_agent_pos
