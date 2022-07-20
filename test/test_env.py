@@ -3,7 +3,7 @@ import gym
 import gym_labyrinth
 import time 
 
-env = gym.make('Labyrinth-v0', connect_gui=True, random_agent_pos=0)
+env = gym.make('Labyrinth-v1', connect_gui=True, random_agent_pos=0)
 state = env.reset()
 
 print(env.action_space)

@@ -40,7 +40,7 @@ class PhysicalEnv(gym.Env):
         if obj_type == "target":
             obj = PhysicalObjects(position, **kwargs)
         elif obj_type == "agent":
-            kwargs['urdf'] = "sphere_small.urdf"
+            kwargs['urdf'] = "sphere2red.urdf"
             obj = Agent(position, **kwargs)
         elif obj_type == "obstacle":
             obj = PhysicalObjects(position, **kwargs)

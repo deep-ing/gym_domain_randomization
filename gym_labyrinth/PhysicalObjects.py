@@ -14,7 +14,8 @@ class PhysicalObjects:
         self.move_kind = "random_direction"
         self.alive = True
         p.changeDynamics(self.pid, -1, mass=kwargs.get("mass", 0.01))
-        p.changeVisualShape(self.pid, -1, rgbaColor=kwargs.get("color", [0,0,125,1]))
+        if "color" in kwargs:
+            p.changeVisualShape(self.pid, -1, rgbaColor=kwargs.get("color", [0,0,125,1]))
 
     def move(self, kind, bound, **kwargs):
         if np.linalg.norm(self.position) > bound:

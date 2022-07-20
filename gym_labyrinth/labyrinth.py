@@ -8,21 +8,21 @@ import pybullet_data
 
 
 AGENT_INFO = {
-        "globalScaling" : 5,
+        "globalScaling" : 0.5,
         "acc" : 2.0,
         "max_speed" : 10,
-        "color" : [0,125,0,1]
+        # "color" : [0,125,0,1]
     }
 
 OBSTACLE_INFO = {"globalScaling" : 20,
-        "color" : [0,0,0,0.5],
+        "color" : [0,0,0,0.9],
         "acc" : 0.0001,
         "max_speed" : 2}
 
 MAP_SIZE = 10 
 
 class Labyrinth(PhysicalEnv):
-    def __init__(self, connect_gui=False, random_agent_pos=7):
+    def __init__(self, connect_gui=False, random_agent_pos=7, physical_steps=1):
         
         super().__init__(MAP_SIZE, None, AGENT_INFO, OBSTACLE_INFO)
         
@@ -30,7 +30,7 @@ class Labyrinth(PhysicalEnv):
         self.set_system_params(np.zeros(6,))
         self.map = GridMap1()
         self.num_obstacles = self.map.num_obstacles
-        
+        self.physical_steps = physical_steps
         self.action_space = gym.spaces.Discrete(5) 
         
         # TODO : define the observation space
@@ -60,6 +60,8 @@ class Labyrinth(PhysicalEnv):
                           self.obs_info['projection_matrix'],
                           renderer=self.obs_info['renderer'])
         return images[2]/255.0    
+    
+    
     def connect(self, connect_gui):
         if connect_gui:
             p.connect(p.GUI)            
@@ -113,7 +115,8 @@ class Labyrinth(PhysicalEnv):
         self.apply_system_params(agent)
         agent.take_action(agent_action)     
         # Apply system parameters        
-        p.stepSimulation()
+        for i in range(self.physical_steps):
+            p.stepSimulation()
         for object_type, object_list in self.objects.items():
             for obj in object_list:
                 if obj.alive:
@@ -142,4 +145,4 @@ class Labyrinth(PhysicalEnv):
         return done
          
     def _info(self):
-        return {}
+        return {'system_vector' : self.system_vector}
