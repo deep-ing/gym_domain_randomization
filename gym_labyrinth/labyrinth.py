@@ -51,7 +51,7 @@ class Labyrinth(PhysicalEnv):
         
         self.obs_info['view_matrix'] = p.computeViewMatrix([0, 0, 11.0], [0, 0, 0], [0, 1, 0])
         self.obs_info['projection_matrix'] = p.computeProjectionMatrixFOV(fov, aspect, near, far)
-        self.observation_space = gym.spaces.Box(-np.inf, np.inf, shape=(self.obs_info['width'],self.obs_info['height'], 4)) 
+        self.observation_space = gym.spaces.Box(-np.inf, np.inf, shape=(4,self.obs_info['width'],self.obs_info['height'])) 
         
     def obs(self):
         images = p.getCameraImage(self.obs_info['width'],
@@ -59,7 +59,7 @@ class Labyrinth(PhysicalEnv):
                           self.obs_info['view_matrix'],
                           self.obs_info['projection_matrix'],
                           renderer=self.obs_info['renderer'])
-        return images[2]/255.0    
+        return images[2].transpose(2,0,1)/255.0    
     
     
     def connect(self, connect_gui):
