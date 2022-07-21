@@ -4,14 +4,18 @@ import numpy as np
 
 def make_env(env_id, seed, idx):
     def thunk():
-        env = gym.make(env_id)
+        env = gym.make(env_id, system_random_interval=[[(0,0.1)], # list of the first  interval
+                                                        [(0,0.2), (0.4,0.5)], # list of the second interval
+                                                        [(0.99,1)],
+                                                        [(0.01,0.03), (0.09, 0.1)],
+                                                        [(0,1)],
+                                                        [(0,1)]])
         env = gym.wrappers.RecordEpisodeStatistics(env)
         env.seed(seed)
         env.action_space.seed(seed)
         env.observation_space.seed(seed)
         return env
     return thunk
-
 
 num_envs = 4
 envs_list = [make_env("Labyrinth-v1", 0, i) for i in range(num_envs)]

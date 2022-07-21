@@ -22,7 +22,16 @@ OBSTACLE_INFO = {"globalScaling" : 20,
 MAP_SIZE = 10 
 
 class Labyrinth(PhysicalEnv):
-    def __init__(self, connect_gui=False, random_agent_pos=7, physical_steps=1):
+    def __init__(self, 
+                connect_gui=False, 
+                random_agent_pos=7, 
+                physical_steps=1, 
+                system_random_interval=[[(0,1)], # list of the first  interval
+                                        [(0,1)], # list of the second interval
+                                        [(0,1)],
+                                        [(0,1)],
+                                        [(0,1)],
+                                        [(0,1)]]):
         
         super().__init__(MAP_SIZE, None, AGENT_INFO, OBSTACLE_INFO)
         
@@ -32,11 +41,14 @@ class Labyrinth(PhysicalEnv):
         self.num_obstacles = self.map.num_obstacles
         self.physical_steps = physical_steps
         self.action_space = gym.spaces.Discrete(5) 
+        self.system_random_interval = system_random_interval
         
         # TODO : define the observation space
         self.connect(connect_gui)
         self.random_agent_pos = random_agent_pos
-        
+        system_vector = self.get_random_system_params()
+        self.set_system_params(system_vector)
+
         self.obs_info = {"width": 128, 
                          "height":128,
                          "fov" : 60,
@@ -70,7 +82,13 @@ class Labyrinth(PhysicalEnv):
             
     
     def get_random_system_params(self):
-        system_vector = np.random.random(6,)
+        system_vector = np.zeros(shape=(6,))
+        for i, element in enumerate(self.system_random_interval):
+            candidates = [] 
+            for left, right in element:
+                candidates.append(np.random.uniform(left, right))
+            system_vector[i] = np.random.choice(candidates)
+        
         return system_vector
     
     def set_system_params(self, system_vector):
