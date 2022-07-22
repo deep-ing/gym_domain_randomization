@@ -9,7 +9,7 @@ import pybullet_data
 
 AGENT_INFO = {
         "globalScaling" : 0.5,
-        "acc" : 2.0,
+        "acc" : 1.0,
         "max_speed" : 10,
         # "color" : [0,125,0,1]
     }
