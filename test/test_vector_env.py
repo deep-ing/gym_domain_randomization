@@ -18,7 +18,7 @@ def make_env(env_id, seed, idx):
     return thunk
 
 num_envs = 4
-envs_list = [make_env("Labyrinth-v1", 0, i) for i in range(num_envs)]
+envs_list = [make_env("Labyrinth-v0", 0, i) for i in range(num_envs)]
 envs = gym.vector.SyncVectorEnv(
     envs_list
 )

@@ -9,7 +9,7 @@ import pybullet_data
 
 AGENT_INFO = {
         "globalScaling" : 0.5,
-        "acc" : 1.0,
+        "acc" : 2.0,
         "max_speed" : 10,
         # "color" : [0,125,0,1]
     }
@@ -25,13 +25,13 @@ class Labyrinth(PhysicalEnv):
     def __init__(self, 
                 connect_gui=False, 
                 random_agent_pos=7, 
-                physical_steps=1, 
-                system_random_interval=[[(0,1)], # list of the first  interval
+                physical_steps=10, 
+                system_random_interval=[[(0,0.1)], # list of the first  interval
                                         [(0,1)], # list of the second interval
-                                        [(0,1)],
-                                        [(0,1)],
-                                        [(0,1)],
-                                        [(0,1)]]):
+                                        [(0,0.1)],
+                                        [(0,0.1)],
+                                        [(0,0.1)],
+                                        [(0,0.1)]]):
         
         super().__init__(MAP_SIZE, None, AGENT_INFO, OBSTACLE_INFO)
         

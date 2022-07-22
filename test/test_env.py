@@ -3,7 +3,7 @@ import gym
 import gym_labyrinth
 import time 
 
-env = gym.make('Labyrinth-v1', connect_gui=False, random_agent_pos=0, physical_steps=10)
+env = gym.make('Labyrinth-v0', connect_gui=True)
 state = env.reset()
 
 print(env.action_space)
@@ -14,6 +14,8 @@ for j in range(100000):
     # time.sleep(0.001)
     if done:
         print(timestep)
+        sv = env.get_random_system_params()
+        env.set_system_params(sv)
         env.reset()
         timestep = 0
     timestep += 1
