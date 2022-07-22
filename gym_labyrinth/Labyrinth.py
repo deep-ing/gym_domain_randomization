@@ -150,9 +150,10 @@ class Labyrinth(PhysicalEnv):
 
     def _reward(self, agent): 
         if agent.position[0] >2 and agent.position[1] < -3:
-            reward = 1
+            reward = 0
         else:
-            reward = -0.001 # time penalty
+            # time penalty
+            reward =  - 0.1 
         return reward 
 
     def _done(self, agent):
