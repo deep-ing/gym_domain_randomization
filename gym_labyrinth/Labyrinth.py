@@ -71,7 +71,9 @@ class Labyrinth(PhysicalEnv):
                           self.obs_info['view_matrix'],
                           self.obs_info['projection_matrix'],
                           renderer=self.obs_info['renderer'])
-        return images[2].transpose(2,0,1)/255.0    
+
+        obs = images[2].transpose(2,0,1)/255.0               
+        return obs 
     
     
     def connect(self, connect_gui):
@@ -164,4 +166,4 @@ class Labyrinth(PhysicalEnv):
         return done
          
     def _info(self):
-        return {'system_vector' : self.system_vector}
+        return {}
