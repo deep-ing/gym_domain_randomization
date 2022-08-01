@@ -11,13 +11,12 @@ import numpy as np
 from gym.spaces import Box
 from gym import utils
 
-class Env(HalfCheetahEnv):
+class HalfCheetahRandomizeEnv(HalfCheetahEnv):
     def __init__(self, **kwargs):
         observation_space = Box(low=-np.inf, high=np.inf, shape=(17,), dtype=np.float64)
         mujoco_env.MujocoEnv.__init__(self, kwargs.get('xml_name'), frame_skip=5)
         utils.EzPickle.__init__(self)
         xml_list = os.listdir(os.path.join(os.path.dirname(mujoco_env.__file__), "assets"))
-
 
         # randomization
         self.reference_path = os.path.join(os.path.dirname(mujoco_env.__file__), "assets", kwargs.get('xml_name'))
@@ -52,7 +51,7 @@ class Env(HalfCheetahEnv):
 
 
 
-env = Env(xml_name="half_cheetah.xml")
+env = HalfCheetahRandomizeEnv(xml_name="half_cheetah.xml")
 xml = env.set_system_params(np.zeros(6,))
 
 done = False 

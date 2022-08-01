@@ -1,4 +1,4 @@
-from gym_labyrinth.PhysicalObjects import PhysicalObjects, Agent
+from gym_domain_randomizer.PhysicalObjects import PhysicalObjects, Agent
 import pybullet as p 
 import numpy as np 
 import time 

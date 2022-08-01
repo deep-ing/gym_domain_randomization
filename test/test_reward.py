@@ -1,6 +1,6 @@
 from random import random
 import gym
-import gym_labyrinth
+import gym_domain_randomizer
 import time 
 import numpy as np
 

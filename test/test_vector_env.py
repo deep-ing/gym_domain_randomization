@@ -1,5 +1,5 @@
 import gym 
-import gym_labyrinth
+import gym_domain_randomizer
 import numpy as np
 
 def make_env(env_id, seed, idx):

@@ -1,8 +1,8 @@
 from os import system
 import gym 
 import pybullet as p
-from gym_labyrinth.maps import GridMap1
-from gym_labyrinth.PhysicalEnv import PhysicalEnv
+from gym_domain_randomizer.maps import GridMap1
+from gym_domain_randomizer.PhysicalEnv import PhysicalEnv
 import numpy as np 
 import pybullet_data 
 
