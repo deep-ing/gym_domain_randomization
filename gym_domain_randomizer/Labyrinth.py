@@ -25,29 +25,26 @@ class Labyrinth(PhysicalEnv):
     def __init__(self, 
                 connect_gui=False, 
                 random_agent_pos=7, 
-                physical_steps=10, 
-                system_random_interval=[[(0,0.1)], # list of the first  interval
-                                        [(0,1)], # list of the second interval
-                                        [(0,0.1)],
-                                        [(0,0.1)],
-                                        [(0,0.1)],
-                                        [(0,0.1)]]):
+                physical_steps=10,):
         
         super().__init__(MAP_SIZE, None, AGENT_INFO, OBSTACLE_INFO)
-        
+
         # wind (2 theta, magnitude)  # friction (4 direction)
-        self.set_system_params(np.zeros(6,))
+        self.r = 1
+        self.theta = 1
+        self.direction_friction_up = 1
+        self.direction_friction_down = 1
+        self.direction_friction_left = 1
+        self.direction_friction_right = 1
+
         self.map = GridMap1()
         self.num_obstacles = self.map.num_obstacles
         self.physical_steps = physical_steps
         self.action_space = gym.spaces.Discrete(5) 
-        self.system_random_interval = system_random_interval
         
         # TODO : define the observation space
         self.connect(connect_gui)
         self.random_agent_pos = random_agent_pos
-        system_vector = self.get_random_system_params()
-        self.set_system_params(system_vector)
 
         self.obs_info = {"width": 128, 
                          "height":128,
@@ -81,25 +78,10 @@ class Labyrinth(PhysicalEnv):
             p.connect(p.GUI)            
         else:
             p.connect(p.DIRECT)    
-            
-    
-    def get_random_system_params(self):
-        system_vector = np.zeros(shape=(6,))
-        for i, element in enumerate(self.system_random_interval):
-            candidates = [] 
-            for left, right in element:
-                candidates.append(np.random.uniform(left, right))
-            system_vector[i] = np.random.choice(candidates)
-        
-        return system_vector
-    
-    def set_system_params(self, system_vector):
-        assert system_vector.shape == (6,)
-        self.system_vector = system_vector
     
     def apply_system_params(self, agent):
         # wind effect 
-        r, theta = self.system_vector[:2]
+        r, theta = self.r, self.theta
         x, y = (r*np.cos(2*np.pi*theta), r*np.sin(2*np.pi*theta))
         force = [x,y,0]
         p.applyExternalForce(agent.pid, -1, 
@@ -107,7 +89,7 @@ class Labyrinth(PhysicalEnv):
                             posObj=agent.position,
                             flags=p.WORLD_FRAME) 
         # directional friction 
-        agent.direction_friction = self.system_vector[2:]
+        agent.direction_friction = [self.direction_friction_up, self.direction_friction_down, self.direction_friction_left, self.direction_friction_right]
         # ======================
         
     def reset(self):
