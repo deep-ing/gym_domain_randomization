@@ -30,12 +30,12 @@ class Labyrinth(PhysicalEnv):
         super().__init__(MAP_SIZE, None, AGENT_INFO, OBSTACLE_INFO)
 
         # wind (2 theta, magnitude)  # friction (4 direction)
-        self.r = 1
-        self.theta = 1
-        self.direction_friction_up = 1
-        self.direction_friction_down = 1
-        self.direction_friction_left = 1
-        self.direction_friction_right = 1
+        self.r = 0.2
+        self.theta = 0.2
+        self.direction_friction_up = 0.2
+        self.direction_friction_down = 0.2
+        self.direction_friction_left = 0.2
+        self.direction_friction_right = 0.2
 
         self.map = GridMap1()
         self.num_obstacles = self.map.num_obstacles
