@@ -24,7 +24,7 @@ MAP_SIZE = 10
 class Labyrinth(PhysicalEnv):
     def __init__(self, 
                 connect_gui=False, 
-                random_agent_pos=7, 
+                random_agent_pos=0, 
                 physical_steps=10,):
         
         super().__init__(MAP_SIZE, None, AGENT_INFO, OBSTACLE_INFO)
