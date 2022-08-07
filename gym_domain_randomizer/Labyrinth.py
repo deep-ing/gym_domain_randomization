@@ -72,6 +72,13 @@ class Labyrinth(PhysicalEnv):
         obs = images[2].transpose(2,0,1)/255.0               
         return obs 
     
+    def set_system_params(self, vector):
+        self.r = vector[0]
+        self.theta = vector[1]
+        self.direction_friction_up = vector[2]
+        self.direction_friction_down = vector[3]
+        self.direction_friction_left = vector[4] 
+        self.direction_friction_right = vector[5]
     
     def connect(self, connect_gui):
         if connect_gui:
@@ -138,6 +145,7 @@ class Labyrinth(PhysicalEnv):
         else:
             # time penalty
             reward =  - 0.1 
+            reward +=  - np.abs(agent.position - np.array([2,-3,0])) 
         return reward 
 
     def _done(self, agent):
