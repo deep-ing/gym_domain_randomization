@@ -9,7 +9,7 @@ import pybullet_data
 
 AGENT_INFO = {
         "globalScaling" : 0.5,
-        "acc" : 2.0,
+        "acc" : 3.0,
         "max_speed" : 10,
         # "color" : [0,125,0,1]
     }
@@ -141,11 +141,12 @@ class Labyrinth(PhysicalEnv):
 
     def _reward(self, agent): 
         if agent.position[0] >2 and agent.position[1] < -3:
-            reward = 0
+            reward = 100
         else:
-            # time penalty
-            reward =  - 0.1 
-            reward +=  - np.abs(agent.position - np.array([2,-3,0])) 
+            # bias reward :(-1 ~ 0)
+            reward =  -0.25 + np.sign(agent.position[0])/4   # bias to right
+            reward += -0.25 - np.sign(agent.position[1])/4   # bias to bottom
+            # reward +=  - np.mean(np.abs(agent.position - np.array([2,-3,0])))
         return reward 
 
     def _done(self, agent):
