@@ -44,10 +44,10 @@ class Labyrinth(PhysicalEnv):
         self.physical_steps = physical_steps
         
         if self.continuous:
-            self.action_space = gym.spaces.Box(-5.0, 5.0, shape=(2,))
+            self.action_space = gym.spaces.Box(0, AGENT_INFO['acc'], shape=(4,))
             self.agent_info['continuous'] = True
         else:
-            self.action_space = gym.spaces.Discrete(5) 
+            self.action_space = gym.spaces.Discrete(4) 
             self.agent_info['continuous'] = False
         
         # TODO : define the observation space

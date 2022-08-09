@@ -85,8 +85,8 @@ class PhysicalObjects:
 
 from gym.spaces import Discrete, Box, Dict
 class Agent(PhysicalObjects):
-    dx = [0, 0, 0, -1,1] # right, left, up (reversed), down 
-    dy = [0, 1,-1, 0, 0]
+    dx = [0, 0, -1,1,0] # right, left, up (reversed), down 
+    dy = [1,-1, 0, 0,0]
     def __init__(self, initial_position, continuous, **kwargs):
         super().__init__(initial_position, **kwargs)
         self.action_size = kwargs.get('action_size', 6)
@@ -102,26 +102,27 @@ class Agent(PhysicalObjects):
     def take_action(self, action):
         if self.continuous:
             # up down left right
-            x_friction = (1-self.direction_friction[2]) if action[0] < 0 else (1-self.direction_friction[3])
-            y_friction = (1-self.direction_friction[0]) if action[1] < 0 else (1-self.direction_friction[1])
-            force = [action[0]*x_friction, 
-                     action[1]*y_friction, 
+
+            force = [-action[2] * (1-self.direction_friction[2]) + action[3] * (1-self.direction_friction[3]) , 
+                     -action[0] * (1-self.direction_friction[0]) + action[1] * (1-self.direction_friction[1]) , 
                      0]
             p.applyExternalForce(self.pid, -1, 
                                         forceObj = force,
                                         posObj=self.position,
                                         flags=p.WORLD_FRAME) 
         else:
-            if action < 5 :
-                friction = (1-self.direction_friction[action-1]) if action >0 else 1
-                force = [Agent.dx[action]*self.acc*friction, 
-                        Agent.dy[action]*self.acc*friction, 
-                        0]
+            if action < 8 :
+                action = action%4
+                acc = self.acc //2 if  (action//4) == 1 else self.acc
+                friction = (1-self.direction_friction[action])
+                force = [Agent.dx[action]*acc*friction, 
+                         Agent.dy[action]*acc*friction, 
+                         0]
                 p.applyExternalForce(self.pid, -1, 
                                         forceObj = force,
                                         posObj=self.position,
                                         flags=p.WORLD_FRAME) 
-            elif action == 5 :
+            elif action == 8 :
                 p.resetBaseVelocity(self.pid, [0,0,0])
             else:
                 raise ValueError("Undefined action %d" %action)
