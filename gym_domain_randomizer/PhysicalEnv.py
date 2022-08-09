@@ -23,7 +23,7 @@ class PhysicalEnv(gym.Env):
         self.agent_info    = agent_info
         self.obstacle_info = obstacle_info 
 
-    def build_position(self, obj_type, position=None, **kwargs):
+    def build_position(self, obj_type, position=None, continuous=False, **kwargs):
         if position is None:
             while True:
                 conflict = False 
@@ -41,7 +41,7 @@ class PhysicalEnv(gym.Env):
             obj = PhysicalObjects(position, **kwargs)
         elif obj_type == "agent":
             kwargs['urdf'] = "sphere2red.urdf"
-            obj = Agent(position, **kwargs)
+            obj = Agent(position, continuous, **kwargs)
         elif obj_type == "obstacle":
             obj = PhysicalObjects(position, **kwargs)
         self.objects[obj_type].append(obj)

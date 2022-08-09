@@ -87,7 +87,7 @@ from gym.spaces import Discrete, Box, Dict
 class Agent(PhysicalObjects):
     dx = [0, 0, 0, -1,1] # right, left, up (reversed), down 
     dy = [0, 1,-1, 0, 0]
-    def __init__(self, initial_position, **kwargs):
+    def __init__(self, initial_position, continuous, **kwargs):
         super().__init__(initial_position, **kwargs)
         self.action_size = kwargs.get('action_size', 6)
         self.action_space = Discrete(self.action_size)
@@ -96,21 +96,35 @@ class Agent(PhysicalObjects):
                                         'own_velocity': Box(low=-np.inf, high=np.inf, shape=(3,))
                                     }) 
         self.direction_friction = np.zeros(shape=(4,))
+        self.continuous = continuous
+
 
     def take_action(self, action):
-        if action < 5 :
-            friction = (1-self.direction_friction[action-1]) if action >0 else 1
-            force = [Agent.dx[action]*self.acc*friction, 
-                     Agent.dy[action]*self.acc*friction, 
+        if self.continuous:
+            # up down left right
+            x_friction = (1-self.direction_friction[2]) if action[0] < 0 else (1-self.direction_friction[3])
+            y_friction = (1-self.direction_friction[0]) if action[1] < 0 else (1-self.direction_friction[1])
+            force = [action[0]*x_friction, 
+                     action[1]*y_friction, 
                      0]
             p.applyExternalForce(self.pid, -1, 
-                                    forceObj = force,
-                                    posObj=self.position,
-                                    flags=p.WORLD_FRAME) 
-        elif action == 5 :
-            p.resetBaseVelocity(self.pid, [0,0,0])
+                                        forceObj = force,
+                                        posObj=self.position,
+                                        flags=p.WORLD_FRAME) 
         else:
-            raise ValueError("Undefined action %d" %action)
+            if action < 5 :
+                friction = (1-self.direction_friction[action-1]) if action >0 else 1
+                force = [Agent.dx[action]*self.acc*friction, 
+                        Agent.dy[action]*self.acc*friction, 
+                        0]
+                p.applyExternalForce(self.pid, -1, 
+                                        forceObj = force,
+                                        posObj=self.position,
+                                        flags=p.WORLD_FRAME) 
+            elif action == 5 :
+                p.resetBaseVelocity(self.pid, [0,0,0])
+            else:
+                raise ValueError("Undefined action %d" %action)
 
     def relative_position(self, other):
         reltaive = np.array([other.position[i] - self.position[i] for i in range(3)])

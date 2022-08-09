@@ -25,7 +25,8 @@ class Labyrinth(PhysicalEnv):
     def __init__(self, 
                 connect_gui=False, 
                 random_agent_pos=0, 
-                physical_steps=10,):
+                physical_steps=10,
+                continuous=False):
         
         super().__init__(MAP_SIZE, None, AGENT_INFO, OBSTACLE_INFO)
 
@@ -36,11 +37,18 @@ class Labyrinth(PhysicalEnv):
         self.direction_friction_down = 0.2
         self.direction_friction_left = 0.2
         self.direction_friction_right = 0.2
+        self.continuous = continuous
 
         self.map = GridMap1()
         self.num_obstacles = self.map.num_obstacles
         self.physical_steps = physical_steps
-        self.action_space = gym.spaces.Discrete(5) 
+        
+        if self.continuous:
+            self.action_space = gym.spaces.Box(-5.0, 5.0, shape=(2,))
+            self.agent_info['continuous'] = True
+        else:
+            self.action_space = gym.spaces.Discrete(5) 
+            self.agent_info['continuous'] = False
         
         # TODO : define the observation space
         self.connect(connect_gui)
@@ -117,6 +125,8 @@ class Labyrinth(PhysicalEnv):
                     self.build_position("obstacle", [r-self.map.init_position[0], c-self.map.init_position[1] ,0], **self.obstacle_info)
         for obj in self.objects["obstacle"]:
             p.changeDynamics(obj.pid, -1, mass=100000)
+
+        
         return self.obs()
 
     def step(self, agent_action):
