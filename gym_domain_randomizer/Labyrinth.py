@@ -27,7 +27,7 @@ class Labyrinth(PhysicalEnv):
                 random_agent_pos=0, 
                 physical_steps=10,
                 acc=3.0,
-                size=128,
+                size=64,
                 continuous=False):
         
         AGENT_INFO['acc'] = acc
