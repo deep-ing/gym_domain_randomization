@@ -146,7 +146,6 @@ class Labyrinth(PhysicalEnv):
                     obj.decrease_velocity()
                     obj.clip_velocity()
 
-
         reward = self._reward(agent)
         done = self._done(agent)
         info = self._info()
@@ -154,7 +153,7 @@ class Labyrinth(PhysicalEnv):
 
     def _reward(self, agent): 
         reward = 0
-        if agent.position[0] >2 and agent.position[1] < -3:
+        if agent.position[0] >2: # and agent.position[1] < -3:
             reward += 100
         else:
             # bias reward :(-1 ~ 0)
@@ -167,7 +166,7 @@ class Labyrinth(PhysicalEnv):
         return reward 
 
     def _done(self, agent):
-        if agent.position[0] > 2 and agent.position[1] < -3:
+        if agent.position[0] > 2: # and agent.position[1] < -3:
             done = True
         else:
             done = False
