@@ -28,8 +28,8 @@ class Labyrinth(PhysicalEnv):
                 physical_steps=10,
                 acc=3.0,
                 size=64,
-                use_down_bias_reward=False,
-                use_right_bias_reward=False,
+                use_down_bias_reward=True,
+                use_right_bias_reward=True,
                 continuous=False):
         
         AGENT_INFO['acc'] = acc
