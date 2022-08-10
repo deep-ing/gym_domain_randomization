@@ -28,6 +28,8 @@ class Labyrinth(PhysicalEnv):
                 physical_steps=10,
                 acc=3.0,
                 size=64,
+                use_down_bias_reward=False,
+                use_right_bias_reward=False,
                 continuous=False):
         
         AGENT_INFO['acc'] = acc
@@ -45,7 +47,9 @@ class Labyrinth(PhysicalEnv):
         self.map = GridMap1()
         self.num_obstacles = self.map.num_obstacles
         self.physical_steps = physical_steps
-        
+        self.use_down_bias_reward = use_down_bias_reward
+        self.use_right_bias_reward = use_right_bias_reward
+
         if self.continuous:
             self.action_space = gym.spaces.Box(0, AGENT_INFO['acc'], shape=(4,))
             self.agent_info['continuous'] = True
@@ -149,13 +153,17 @@ class Labyrinth(PhysicalEnv):
         return self.obs(), reward, done, info
 
     def _reward(self, agent): 
+        reward = 0
         if agent.position[0] >2 and agent.position[1] < -3:
-            reward = 100
+            reward += 100
         else:
             # bias reward :(-1 ~ 0)
-            reward =  -0.25 + np.sign(agent.position[0])/4   # bias to right
-            reward += -0.25 - np.sign(agent.position[1])/4   # bias to bottom
-            # reward +=  - np.mean(np.abs(agent.position - np.array([2,-3,0])))
+            if self.use_down_bias_reward:
+                reward += -0.25 - np.sign(agent.position[1])/4   # bias to bottom
+
+            if self.use_right_bias_reward:
+                reward +=  -0.25 + np.sign(agent.position[0])/4   # bias to right
+
         return reward 
 
     def _done(self, agent):
