@@ -9,7 +9,7 @@ import pybullet_data
 
 AGENT_INFO = {
         "globalScaling" : 0.5,
-        "acc" : 3.0,
+        "acc" : 5.0,
         "max_speed" : 10,
         # "color" : [0,125,0,1]
     }
@@ -26,8 +26,10 @@ class Labyrinth(PhysicalEnv):
                 connect_gui=False, 
                 random_agent_pos=0, 
                 physical_steps=10,
+                acc=3.0,
                 continuous=False):
         
+        AGENT_INFO['acc'] = acc
         super().__init__(MAP_SIZE, None, AGENT_INFO, OBSTACLE_INFO)
 
         # wind (2 theta, magnitude)  # friction (4 direction)
