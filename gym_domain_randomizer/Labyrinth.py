@@ -9,7 +9,7 @@ import pybullet_data
 
 AGENT_INFO = {
         "globalScaling" : 0.5,
-        "acc" : 5.0,
+        "acc" : 3.0,
         "max_speed" : 10,
         # "color" : [0,125,0,1]
     }
@@ -33,12 +33,12 @@ class Labyrinth(PhysicalEnv):
         super().__init__(MAP_SIZE, None, AGENT_INFO, OBSTACLE_INFO)
 
         # wind (2 theta, magnitude)  # friction (4 direction)
-        self.r = 0.2
-        self.theta = 0.2
-        self.direction_friction_up = 0.2
-        self.direction_friction_down = 0.2
-        self.direction_friction_left = 0.2
-        self.direction_friction_right = 0.2
+        self.r = 1.0
+        self.theta = 1.0
+        self.direction_friction_up = 1.0
+        self.direction_friction_down = 1.0
+        self.direction_friction_left = 1.0
+        self.direction_friction_right = 1.0
         self.continuous = continuous
 
         self.map = GridMap1()
@@ -83,12 +83,8 @@ class Labyrinth(PhysicalEnv):
         return obs 
     
     def set_system_params(self, vector):
-        self.r = vector[0]
-        self.theta = vector[1]
-        self.direction_friction_up = vector[2]
-        self.direction_friction_down = vector[3]
-        self.direction_friction_left = vector[4] 
-        self.direction_friction_right = vector[5]
+        for k, v in vector.items():
+            setattr(self, k, v)
     
     def connect(self, connect_gui):
         if connect_gui:
