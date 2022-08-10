@@ -27,6 +27,7 @@ class Labyrinth(PhysicalEnv):
                 random_agent_pos=0, 
                 physical_steps=10,
                 acc=3.0,
+                size=128,
                 continuous=False):
         
         AGENT_INFO['acc'] = acc
@@ -56,8 +57,8 @@ class Labyrinth(PhysicalEnv):
         self.connect(connect_gui)
         self.random_agent_pos = random_agent_pos
 
-        self.obs_info = {"width": 128, 
-                         "height":128,
+        self.obs_info = {"width": size, 
+                         "height":size,
                          "fov" : 60,
                          "aspect" :1,
                          "near" : 0.02,
