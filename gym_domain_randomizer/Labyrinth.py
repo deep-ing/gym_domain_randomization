@@ -9,7 +9,7 @@ import pybullet_data
 
 AGENT_INFO = {
         "globalScaling" : 0.5,
-        "acc" : 2.0,
+        "acc" : 3.0,
         "max_speed" : 10,
         # "color" : [0,125,0,1]
     }
@@ -25,29 +25,44 @@ class Labyrinth(PhysicalEnv):
     def __init__(self, 
                 connect_gui=False, 
                 random_agent_pos=0, 
-                physical_steps=10,):
+                physical_steps=10,
+                acc=3.0,
+                size=64,
+                use_down_bias_reward=True,
+                use_right_bias_reward=True,
+                continuous=False):
         
+        AGENT_INFO['acc'] = acc
         super().__init__(MAP_SIZE, None, AGENT_INFO, OBSTACLE_INFO)
 
         # wind (2 theta, magnitude)  # friction (4 direction)
-        self.r = 0.2
-        self.theta = 0.2
-        self.direction_friction_up = 0.2
-        self.direction_friction_down = 0.2
-        self.direction_friction_left = 0.2
-        self.direction_friction_right = 0.2
+        self.r = 1.0
+        self.theta = 1.0
+        self.direction_friction_up = 1.0
+        self.direction_friction_down = 1.0
+        self.direction_friction_left = 1.0
+        self.direction_friction_right = 1.0
+        self.continuous = continuous
 
         self.map = GridMap1()
         self.num_obstacles = self.map.num_obstacles
         self.physical_steps = physical_steps
-        self.action_space = gym.spaces.Discrete(5) 
+        self.use_down_bias_reward = use_down_bias_reward
+        self.use_right_bias_reward = use_right_bias_reward
+
+        if self.continuous:
+            self.action_space = gym.spaces.Box(0, AGENT_INFO['acc'], shape=(4,))
+            self.agent_info['continuous'] = True
+        else:
+            self.action_space = gym.spaces.Discrete(4) 
+            self.agent_info['continuous'] = False
         
         # TODO : define the observation space
         self.connect(connect_gui)
         self.random_agent_pos = random_agent_pos
 
-        self.obs_info = {"width": 128, 
-                         "height":128,
+        self.obs_info = {"width": size, 
+                         "height":size,
                          "fov" : 60,
                          "aspect" :1,
                          "near" : 0.02,
@@ -73,12 +88,8 @@ class Labyrinth(PhysicalEnv):
         return obs 
     
     def set_system_params(self, vector):
-        self.r = vector[0]
-        self.theta = vector[1]
-        self.direction_friction_up = vector[2]
-        self.direction_friction_down = vector[3]
-        self.direction_friction_left = vector[4] 
-        self.direction_friction_right = vector[5]
+        for k, v in vector.items():
+            setattr(self, k, v)
     
     def connect(self, connect_gui):
         if connect_gui:
@@ -117,6 +128,8 @@ class Labyrinth(PhysicalEnv):
                     self.build_position("obstacle", [r-self.map.init_position[0], c-self.map.init_position[1] ,0], **self.obstacle_info)
         for obj in self.objects["obstacle"]:
             p.changeDynamics(obj.pid, -1, mass=100000)
+
+        
         return self.obs()
 
     def step(self, agent_action):
@@ -133,23 +146,27 @@ class Labyrinth(PhysicalEnv):
                     obj.decrease_velocity()
                     obj.clip_velocity()
 
-
         reward = self._reward(agent)
         done = self._done(agent)
         info = self._info()
         return self.obs(), reward, done, info
 
     def _reward(self, agent): 
-        if agent.position[0] >2 and agent.position[1] < -3:
-            reward = 0
+        reward = 0
+        if agent.position[0] >2: # and agent.position[1] < -3:
+            reward += 100
         else:
-            # time penalty
-            reward =  - 0.1 
-            reward +=  - np.abs(agent.position - np.array([2,-3,0])) 
+            # bias reward :(-1 ~ 0)
+            if self.use_down_bias_reward:
+                reward += -0.25 - np.sign(agent.position[1])/4   # bias to bottom
+
+            if self.use_right_bias_reward:
+                reward +=  -0.25 + np.sign(agent.position[0])/4   # bias to right
+
         return reward 
 
     def _done(self, agent):
-        if agent.position[0] > 2 and agent.position[1] < -3:
+        if agent.position[0] > 2: # and agent.position[1] < -3:
             done = True
         else:
             done = False
