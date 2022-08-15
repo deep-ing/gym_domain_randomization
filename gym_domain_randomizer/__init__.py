@@ -20,3 +20,17 @@ gym.envs.register(
      entry_point='gym_domain_randomizer.PendulumEnv:PendulumEnv',
      max_episode_steps=200
 )
+
+gym.envs.register(
+    id="CartPoleRandomizable-v1",
+    entry_point="gym_domain_randomizer.CartPoleEnv:CartPoleEnv",
+    max_episode_steps=500,
+    reward_threshold=475.0,
+)
+
+gym.envs.register(
+    id="AcrobotRandomizable-v1",
+    entry_point='gym_domain_randomizer.AcrobotEnv:AcrobotEnv',
+    reward_threshold=-100.0,
+    max_episode_steps=500,
+)
